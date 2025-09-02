@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Se connecter</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
+    {{ form.username }}
+    <label for="{{ form.password.id_for_label }}">Mot de passe</label>
+    {{ form.password }}
+    {% if form.non_field_errors %}<p>{{ form.non_field_errors.0 }}</p>{% endif %}
+    <button type="submit">Se connecter</button>
+    <p>Pas de compte ? <a href="{% url 'signup' %}">S'inscrire</a></p>
+  </form>
+{% endblock %}

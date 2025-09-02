@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>S'inscrire</h1>
+
+  {# Bloc erreurs globales (non_field_errors) #}
+  {% if form.non_field_errors %}
+    <div role="alert">
+      {% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div>
+      <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
+      {{ form.username }}
+      {% for e in form.username.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.password1.id_for_label }}">Mot de passe</label>
+      {{ form.password1 }}
+      {% for e in form.password1.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+
+    <div>
+      <label for="{{ form.password2.id_for_label }}">Confirmer le mot de passe</label>
+      {{ form.password2 }}
+      {% for e in form.password2.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+
+    <button type="submit">S'inscrire</button>
+    <p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
+  </form>
+{% endblock %}

@@ -84,18 +84,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    
 ]
 
 
@@ -120,3 +109,31 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "feed"
+LOGOUT_REDIRECT_URL = "login"
+
+LANGUAGE_CODE = "fr-fr"
+TIME_ZONE = "Europe/Paris"
+
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "reviews",   # on a ajouté 
+]
+
+LANGUAGE_CODE = "fr-fr"
+TIME_ZONE = "Europe/Paris"
+
+#Auth redirects
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "feed"
+LOGOUT_REDIRECT_URL = "login"
+
