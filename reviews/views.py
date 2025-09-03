@@ -1,11 +1,16 @@
+from itertools import chain
+
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import CharField, Q, Value
+from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import SignUpForm
+from .forms import SignUpForm, TicketForm, ReviewForm
+from .models import Ticket, Review, UserFollows
 
+# ---------- Auth ----------
 def signup(request):
     if request.method == "POST":
         form = SignUpForm(request.POST)
@@ -13,15 +18,12 @@ def signup(request):
             user = form.save()
             auth_login(request, user)
             messages.success(request, "Bienvenue ! Votre compte est créé.")
-            return redirect("feed")  # en cas de succès, on redirige réponse 302
+            return redirect("feed")
         else:
-            # en cas d'erreur ça boucle réponse 200 
-            print("SIGNUP ERRORS:", form.errors.as_json())
-            messages.error(request, "Veuillez corriger les erreurs ci-dessous.")
+            messages.error(request, "Veuillez corriger les erreurs.")
     else:
         form = SignUpForm()
     return render(request, "signup.html", {"form": form})
-
 
 def signin(request):
     if request.method == "POST":
@@ -35,6 +37,108 @@ def signin(request):
         form = AuthenticationForm(request)
     return render(request, "signin.html", {"form": form})
 
+# ---------- Helpers Flux ----------
+def _following_ids(user):
+    return UserFollows.objects.filter(user=user).values_list("followed_user_id", flat=True)
+
+def get_users_viewable_tickets(user):
+    return Ticket.objects.filter(Q(user__in=_following_ids(user)) | Q(user=user)).select_related("user").prefetch_related("reviews")
+
+def get_users_viewable_reviews(user):
+    base = Review.objects.filter(Q(user__in=_following_ids(user)) | Q(user=user))
+    extra = Review.objects.filter(ticket__user=user)
+    return (base | extra).select_related("user", "ticket", "ticket__user").distinct()
+
+# ---------- Flux ----------
 @login_required
 def feed(request):
-    return render(request, "feed.html")
+    reviews = get_users_viewable_reviews(request.user).annotate(content_type=Value("REVIEW", CharField()))
+    tickets = get_users_viewable_tickets(request.user).annotate(content_type=Value("TICKET", CharField()))
+    posts = sorted(chain(reviews, tickets), key=lambda p: p.time_created, reverse=True)
+    return render(request, "feed.html", {"posts": posts})
+
+# ---------- Tickets: create / update / delete ----------
+@login_required
+def ticket_create(request):
+    if request.method == "POST":
+        form = TicketForm(request.POST, request.FILES)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.user = request.user
+            ticket.save()
+            messages.success(request, "Ticket créé.")
+            return redirect("my_posts")
+    else:
+        form = TicketForm()
+    return render(request, "ticket_form.html", {"form": form, "mode": "create"})
+
+@login_required
+def ticket_update(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, user=request.user)  # sécurité: seulement mes tickets
+    if request.method == "POST":
+        form = TicketForm(request.POST, request.FILES, instance=ticket)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Ticket modifié.")
+            return redirect("my_posts")
+    else:
+        form = TicketForm(instance=ticket)
+    return render(request, "ticket_form.html", {"form": form, "mode": "update", "ticket": ticket})
+
+@login_required
+def ticket_delete(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, user=request.user)  # sécurité
+    if request.method == "POST":
+        ticket.delete()
+        messages.success(request, "Ticket supprimé.")
+        return redirect("my_posts")
+    return render(request, "confirm_delete.html", {"object": ticket, "type": "ticket"})
+
+# ---------- Reviews: create (from ticket) / update / delete ----------
+@login_required
+def review_create_from_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    if ticket.reviews.exists():
+        messages.error(request, "Une critique existe déjà pour ce ticket.")
+        return redirect("feed")
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.user = request.user
+            review.ticket = ticket
+            review.save()
+            messages.success(request, "Critique publiée.")
+            return redirect("my_posts")
+    else:
+        form = ReviewForm()
+    return render(request, "review_form.html", {"form": form, "ticket": ticket, "mode": "create"})
+
+@login_required
+def review_update(request, pk):
+    review = get_object_or_404(Review, pk=pk, user=request.user)  # sécurité: seulement mes reviews
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Critique modifiée.")
+            return redirect("my_posts")
+    else:
+        form = ReviewForm(instance=review)
+    return render(request, "review_form.html", {"form": form, "ticket": review.ticket, "mode": "update"})
+
+@login_required
+def review_delete(request, pk):
+    review = get_object_or_404(Review, pk=pk, user=request.user)
+    if request.method == "POST":
+        review.delete()
+        messages.success(request, "Critique supprimée.")
+        return redirect("my_posts")
+    return render(request, "confirm_delete.html", {"object": review, "type": "review"})
+
+# ---------- Mes posts (liste pour éditer/supprimer) ----------
+@login_required
+def my_posts(request):
+    my_tickets = Ticket.objects.filter(user=request.user).order_by("-time_created")
+    my_reviews = Review.objects.filter(user=request.user).select_related("ticket").order_by("-time_created")
+    return render(request, "my_posts.html", {"tickets": my_tickets, "reviews": my_reviews})

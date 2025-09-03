@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{% if mode == "create" %}Nouveau ticket{% else %}Modifier le ticket{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    <div>
+      <label for="{{ form.title.id_for_label }}">Titre</label>
+      {{ form.title }} {% for e in form.title.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="{{ form.description.id_for_label }}">Description</label>
+      {{ form.description }} {% for e in form.description.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="{{ form.image.id_for_label }}">Image (optionnel)</label>
+      {{ form.image }} {% for e in form.image.errors %}<p>{{ e }}</p>{% endfor %}
+      {% if ticket and ticket.image %}<p>Image actuelle : <img src="{{ ticket.image.url }}" alt="Image du ticket" style="max-width:200px"></p>{% endif %}
+    </div>
+    <button type="submit">{% if mode == "create" %}Créer{% else %}Enregistrer{% endif %}</button>
+  </form>
+{% endblock %}

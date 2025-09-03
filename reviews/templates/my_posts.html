@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Mes posts</h1>
+
+  <p>
+    <a href="{% url 'ticket_create' %}">+ Nouveau ticket</a>
+  </p>
+
+  <h2>Mes tickets</h2>
+  {% for t in tickets %}
+    <article style="border:1px solid #ccc;padding:8px;margin:8px 0;">
+      <header><strong>{{ t.title }}</strong> — {{ t.time_created }}</header>
+      <p>{{ t.description }}</p>
+      {% if t.image %}<img src="{{ t.image.url }}" alt="Image du ticket" style="max-width:200px">{% endif %}
+      <p>
+        <a href="{% url 'ticket_update' t.pk %}">Modifier</a> ·
+        <a href="{% url 'review_create_from_ticket' t.pk %}">Écrire une critique</a> ·
+        <a href="{% url 'ticket_delete' t.pk %}">Supprimer</a>
+      </p>
+    </article>
+  {% empty %}
+    <p>Aucun ticket.</p>
+  {% endfor %}
+
+  <h2>Mes critiques</h2>
+  {% for r in reviews %}
+    <article style="border:1px solid #ccc;padding:8px;margin:8px 0;">
+      <header><strong>{{ r.headline }}</strong> — Note {{ r.rating }}/5 — {{ r.time_created }}</header>
+      <p><em>Sur : {{ r.ticket.title }}</em></p>
+      <p>{{ r.body }}</p>
+      <p>
+        <a href="{% url 'review_update' r.pk %}">Modifier</a> ·
+        <a href="{% url 'review_delete' r.pk %}">Supprimer</a>
+      </p>
+    </article>
+  {% empty %}
+    <p>Aucune critique.</p>
+  {% endfor %}
+{% endblock %}

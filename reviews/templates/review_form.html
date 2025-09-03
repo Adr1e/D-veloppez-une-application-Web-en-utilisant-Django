@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>{% if mode == "create" %}Nouvelle critique{% else %}Modifier la critique{% endif %}</h1>
+
+  <section style="border:1px solid #ccc;padding:8px;margin-bottom:8px">
+    <strong>Ticket :</strong> {{ ticket.title }} — par {{ ticket.user.username }}
+    <br><em>{{ ticket.description }}</em>
+  </section>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div>
+      <label for="{{ form.headline.id_for_label }}">Titre de la critique</label>
+      {{ form.headline }} {% for e in form.headline.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="{{ form.rating.id_for_label }}">Note (0–5)</label>
+      {{ form.rating }} {% for e in form.rating.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <div>
+      <label for="{{ form.body.id_for_label }}">Commentaire</label>
+      {{ form.body }} {% for e in form.body.errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    <button type="submit">{% if mode == "create" %}Publier{% else %}Enregistrer{% endif %}</button>
+  </form>
+{% endblock %}
