@@ -1,0 +1,16 @@
+<article class="ticket" style="border:1px solid #ddd;padding:8px;margin:8px 0;">
+  <header>
+    <strong>Ticket</strong> par {{ ticket.user.username }} —
+    {{ ticket.time_created|date:"Y-m-d H:i" }}
+  </header>
+  <h3>{{ ticket.title }}</h3>
+  {% if ticket.image %}
+    <img src="{{ ticket.image.url }}" alt="Image liée au ticket" style="max-width:240px">
+  {% endif %}
+  <p>{{ ticket.description }}</p>
+  {% if ticket.reviews.all|length %}
+    <p><em>Critique publiée.</em></p>
+  {% else %}
+    <p><em>Pas encore de critique.</em></p>
+  {% endif %}
+</article>

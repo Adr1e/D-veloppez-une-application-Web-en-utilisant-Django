@@ -9,6 +9,8 @@ urlpatterns = [
     path("login/", views.signin, name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
 
+    path("accueil/", views.feed, name="home"),
+
     # Mes posts
     path("mes-posts/", views.my_posts, name="my_posts"),
 
@@ -21,4 +23,9 @@ urlpatterns = [
     path("tickets/<int:ticket_id>/critique/nouvelle/", views.review_create_from_ticket, name="review_create_from_ticket"),
     path("critiques/<int:pk>/modifier/", views.review_update, name="review_update"),
     path("critiques/<int:pk>/supprimer/", views.review_delete, name="review_delete"),
+
+    # Abonnements
+    path("abonnements/", views.subscriptions, name="subscriptions"),
+    path("abonnements/<int:user_id>/desabonner/", views.unfollow, name="unfollow"),
+    
 ]

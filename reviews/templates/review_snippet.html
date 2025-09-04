@@ -1,0 +1,11 @@
+<article class="review" style="border:1px solid #ddd;padding:8px;margin:8px 0;">
+  <header>
+    <strong>Critique</strong> par {{ review.user.username }} —
+    {{ review.time_created|date:"Y-m-d H:i" }}
+  </header>
+  <h3>{{ review.headline }} ({{ review.rating }}/5)</h3>
+  <p>{{ review.body }}</p>
+  <div style="background:#f9f9f9;padding:6px;margin-top:6px">
+    <strong>Sur :</strong> {{ review.ticket.title }} — par {{ review.ticket.user.username }}
+  </div>
+</article>

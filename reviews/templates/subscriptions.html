@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Abonnements</h1>
+
+  <section style="margin-bottom:16px; border:1px solid #ccc; padding:8px;">
+    <h2>Suivre un utilisateur</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+      {{ form.username }}
+      {% for e in form.username.errors %}<p>{{ e }}</p>{% endfor %}
+      <button type="submit">Suivre</button>
+    </form>
+  </section>
+
+  <section style="margin-bottom:16px;">
+    <h2>Vous suivez</h2>
+    {% if following %}
+      <ul>
+        {% for f in following %}
+          <li>
+            {{ f.followed_user.username }}
+            <form method="post" action="{% url 'unfollow' f.followed_user.id %}" style="display:inline">
+              {% csrf_token %}
+              <button type="submit">Se désabonner</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Vous ne suivez personne pour l’instant.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Vos abonnés</h2>
+    {% if followers %}
+      <ul>
+        {% for f in followers %}
+          <li>{{ f.user.username }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>Personne ne vous suit pour le moment.</p>
+    {% endif %}
+  </section>
+{% endblock %}

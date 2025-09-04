@@ -1,4 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-  <p>Vous êtes connecté.</p>
+  <h1>Flux</h1>
+
+  {% for post in posts %}
+    {% if post.content_type == 'TICKET' %}
+      {% include "ticket_snippet.html" with ticket=post %}
+    {% else %}
+      {% include "review_snippet.html" with review=post %}
+    {% endif %}
+  {% empty %}
+    <p>Aucun contenu pour le moment.</p>
+  {% endfor %}
 {% endblock %}
