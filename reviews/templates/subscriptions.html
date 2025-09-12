@@ -1,47 +1,82 @@
 {% extends "base.html" %}
-{% block content %}
-  <h1>Abonnements</h1>
 
-  <section style="margin-bottom:16px; border:1px solid #ccc; padding:8px;">
-    <h2>Suivre un utilisateur</h2>
-    <form method="post" novalidate>
+{% block title %}Abonnements — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on définit le titre de la page {% endcomment %}
+
+{% block content %}
+  <h1 style="font-size:28px; margin:8px 0 32px; text-align:center;">Abonnements</h1>
+  {% comment %} Titre principal de la page {% endcomment %}
+
+  <section class="card" style="max-width:980px; margin:0 auto 32px;">
+    <h2 style="margin-top:0; text-align:center;">Suivre un utilisateur</h2>
+    {% comment %} Premier bloc : formulaire pour suivre un utilisateur par son nom {% endcomment %}
+
+    <form method="post" novalidate style="display:flex; justify-content:center; margin-top:16px;">
       {% csrf_token %}
-      <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
-      {{ form.username }}
-      {% for e in form.username.errors %}<p>{{ e }}</p>{% endfor %}
-      <button type="submit">Suivre</button>
+      <div style="display:grid; grid-template-columns: auto 1fr auto; gap:30px; align-items:center; width:100%; max-width:720px;">
+        <label for="{{ form.username.id_for_label }}" style="margin:0; white-space:nowrap;">
+          Nom d'utilisateur
+        </label>
+        {% comment %} Label du champ, affiché à gauche {% endcomment %}
+
+        {{ form.username }}
+        {% comment %} Champ texte pour saisir le nom d’utilisateur à suivre {% endcomment %}
+
+        <button type="submit" class="btn">Suivre</button>
+        {% comment %} Bouton pour soumettre le formulaire {% endcomment %}
+
+        <div style="grid-column: 1 / -1;">
+          {% for e in form.username.errors %}
+            <p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>
+          {% endfor %}
+          {% if form.username.help_text %}
+            <p class="muted" style="margin:6px 0 0;">{{ form.username.help_text }}</p>
+          {% endif %}
+        </div>
+        {% comment %} Affiche les erreurs ou l’aide du champ en dessous {% endcomment %}
+      </div>
     </form>
   </section>
 
-  <section style="margin-bottom:16px;">
-    <h2>Vous suivez</h2>
+  <section class="card" style="max-width:980px; margin:0 auto 24px;">
+    <h2 style="margin-top:0; text-align:center;">Abonnements</h2>
+    {% comment %} Deuxième bloc : liste des utilisateurs suivis {% endcomment %}
+
     {% if following %}
-      <ul>
+      <ul style="list-style:none; padding:0; margin:0;">
         {% for f in following %}
-          <li>
-            {{ f.followed_user.username }}
-            <form method="post" action="{% url 'unfollow' f.followed_user.id %}" style="display:inline">
+          <li style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
+            <span>{{ f.followed_user.username }}</span>
+            {% comment %} Nom de l’utilisateur suivi {% endcomment %}
+
+            <form method="post" action="{% url 'unfollow' f.followed_user.id %}" style="margin:0;">
               {% csrf_token %}
-              <button type="submit">Se désabonner</button>
+              <button type="submit" class="btn">Se désabonner</button>
             </form>
+            {% comment %} Formulaire pour se désabonner de cet utilisateur {% endcomment %}
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      <p>Vous ne suivez personne pour l’instant.</p>
+      <p class="muted" style="text-align:center;">Vous ne suivez personne pour l’instant.</p>
     {% endif %}
   </section>
 
-  <section>
-    <h2>Vos abonnés</h2>
+  <section class="card" style="max-width:980px; margin:0 auto;">
+    <h2 style="margin-top:0; text-align:center;">Abonnés</h2>
+    {% comment %} Troisième bloc : liste des utilisateurs qui suivent l’utilisateur courant {% endcomment %}
+
     {% if followers %}
-      <ul>
+      <ul style="list-style:none; padding:0; margin:0;">
         {% for f in followers %}
-          <li>{{ f.user.username }}</li>
+          <li style="padding:10px 0; border-bottom:1px solid #eee;">
+            <span>{{ f.user.username }}</span>
+          </li>
+          {% comment %} Nom de l’abonné affiché dans la liste {% endcomment %}
         {% endfor %}
       </ul>
     {% else %}
-      <p>Personne ne vous suit pour le moment.</p>
+      <p class="muted" style="text-align:center;">Personne ne vous suit pour le moment.</p>
     {% endif %}
   </section>
 {% endblock %}

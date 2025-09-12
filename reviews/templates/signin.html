@@ -1,14 +1,55 @@
 {% extends "base.html" %}
+
+{% block header_nav %}{% endblock %}
+{% comment %} On masque la navigation par défaut (pas de menu quand on est sur la page de connexion) {% endcomment %}
+
 {% block content %}
-  <h1>Se connecter</h1>
-  <form method="post" novalidate>
-    {% csrf_token %}
-    <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
-    {{ form.username }}
-    <label for="{{ form.password.id_for_label }}">Mot de passe</label>
-    {{ form.password }}
-    {% if form.non_field_errors %}<p>{{ form.non_field_errors.0 }}</p>{% endif %}
-    <button type="submit">Se connecter</button>
-    <p>Pas de compte ? <a href="{% url 'signup' %}">S'inscrire</a></p>
-  </form>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:48px; align-items:start; min-height:60vh;">
+    {% comment %} Mise en page en deux colonnes : inscription à gauche, connexion à droite {% endcomment %}
+    
+    <section style="justify-self:center; text-align:center; width:100%; max-width:420px;">
+      <h2 style="font-size:28px; margin:24px 0 24px;">Inscrivez-vous maintenant</h2>
+      {% comment %} Bloc gauche : invitation à s'inscrire avec un bouton {% endcomment %}
+      <a href="{% url 'signup' %}" 
+         style="display:inline-block; padding:10px 16px; border:1px solid #111; border-radius:8px; background:#fff; color:#111; text-decoration:none; margin-top:16px;">
+        S'inscrire
+      </a>
+    </section>
+
+    <section style="justify-self:center; width:100%; max-width:520px;">
+      <h2 style="font-size:28px; margin:24px 0 24px; text-align:left;">Connectez-vous</h2>
+      {% comment %} Bloc droit : formulaire de connexion {% endcomment %}
+
+      <form method="post" novalidate style="display:block;">
+        {% csrf_token %}
+        {% comment %} Protection CSRF obligatoire pour le POST {% endcomment %}
+
+        {% if form.non_field_errors %}
+          <div class="flash" style="margin-bottom:16px;">
+            {% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}
+          </div>
+        {% endif %}
+        {% comment %} Affichage des erreurs globales (ex: mauvais identifiants) {% endcomment %}
+
+        <div style="margin-bottom:14px;">
+          {{ form.username }}
+        </div>
+        {% comment %} Champ nom d'utilisateur {% endcomment %}
+
+        <div style="margin-bottom:14px;">
+          {{ form.password }}
+        </div>
+        {% comment %} Champ mot de passe {% endcomment %}
+
+        <div style="text-align:right; margin-top:12px;">
+          <button type="submit" 
+                  style="padding:10px 16px; border:1px solid #111; border-radius:8px; background:#fff;">
+            Se connecter
+          </button>
+        </div>
+        {% comment %} Bouton d'envoi du formulaire de connexion {% endcomment %}
+      </form>
+    </section>
+
+  </div>
 {% endblock %}

@@ -1,14 +1,28 @@
 {% extends "base.html" %}
-{% block content %}
-  <h1>Flux</h1>
+{% block title %}Flux — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on personnalise le titre de l'onglet {% endcomment %}
 
+{% block content %}
+  {% comment %} Boutons d'actions rapides affichés en haut du flux {% endcomment %}
+  <div class="grid2">
+    <a class="btn" href="{% url 'ticket_create' %}">Demander une critique</a>
+    <a class="btn" href="{% url 'review_create_combo' %}">Créer une critique</a>
+  </div>
+
+  <h1 style="font-size:28px; margin-bottom:24px; text-align:center;">Flux</h1>
+  {% comment %} Titre de la page Flux, centré et mis en avant {% endcomment %}
+
+  {% comment %} Parcours tous les posts visibles (tickets + critiques) {% endcomment %}
   {% for post in posts %}
-    {% if post.content_type == 'TICKET' %}
+    {% if post.content_type == "TICKET" %}
+      {% comment %} Si le post est un ticket, on inclut le gabarit ticket_snippet {% endcomment %}
       {% include "ticket_snippet.html" with ticket=post %}
     {% else %}
+      {% comment %} Si le post est une critique, on inclut le gabarit review_snippet {% endcomment %}
       {% include "review_snippet.html" with review=post %}
     {% endif %}
   {% empty %}
-    <p>Aucun contenu pour le moment.</p>
+    {% comment %} Si aucun contenu n'est disponible, on affiche un message neutre {% endcomment %}
+    <p class="muted" style="text-align:center; margin-top:40px;">Aucun contenu pour le moment.</p>
   {% endfor %}
 {% endblock %}

@@ -1,16 +1,32 @@
-<article class="ticket" style="border:1px solid #ddd;padding:8px;margin:8px 0;">
-  <header>
+<article class="ticket" style="border:1px solid #ccc; border-radius:8px; padding:16px; margin:16px auto; max-width:640px; background:#fff;">
+  {% comment %} Bloc affichant un ticket individuel {% endcomment %}
+
+  <header style="margin-bottom:12px;">
     <strong>Ticket</strong> par {{ ticket.user.username }} —
-    {{ ticket.time_created|date:"Y-m-d H:i" }}
+    <span style="color:#555;">{{ ticket.time_created|date:"Y-m-d H:i" }}</span>
   </header>
-  <h3>{{ ticket.title }}</h3>
+  {% comment %} En-tête : type de post (Ticket), auteur et date de création {% endcomment %}
+
+  <h3 style="margin:8px 0; font-size:20px;">{{ ticket.title }}</h3>
+  {% comment %} Titre du ticket {% endcomment %}
+
   {% if ticket.image %}
-    <img src="{{ ticket.image.url }}" alt="Image liée au ticket" style="max-width:240px">
+    <div style="margin:8px 0;">
+      <img src="{{ ticket.image.url }}" alt="Image liée au ticket" style="max-width:240px; border:1px solid #ddd; border-radius:6px;">
+    </div>
   {% endif %}
-  <p>{{ ticket.description }}</p>
-  {% if ticket.reviews.all|length %}
-    <p><em>Critique publiée.</em></p>
+  {% comment %} Image associée au ticket si elle existe {% endcomment %}
+
+  {% if ticket.description %}
+    <p>{{ ticket.description }}</p>
+  {% endif %}
+  {% comment %} Description du ticket si elle a été fournie {% endcomment %}
+
+  {% if ticket.has_reviewed %}
+    <p style="font-style:italic; color:#555;">Vous avez déjà publié une critique.</p>
   {% else %}
-    <p><em>Pas encore de critique.</em></p>
+    <p><a href="{% url 'review_create_from_ticket' ticket.pk %}" class="btn">Écrire une critique</a></p>
   {% endif %}
+  {% comment %} Si l’utilisateur a déjà fait une critique → message d’information 
+              Sinon → bouton pour écrire une critique sur ce ticket {% endcomment %}
 </article>

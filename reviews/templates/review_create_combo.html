@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Créer une critique — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on définit le titre de la page {% endcomment %}
+
+{% block content %}
+  <h1 style="font-size:28px; margin:8px 0 24px; text-align:center;">Créer une critique</h1>
+  {% comment %} Titre principal de la page, affiché centré {% endcomment %}
+
+  <form method="post" enctype="multipart/form-data" novalidate style="max-width:980px; margin:0 auto;">
+    {% csrf_token %}
+    {% comment %} Formulaire combiné : on crée à la fois un ticket et une critique {% endcomment %}
+
+    <fieldset class="card" style="margin-bottom:16px;">
+      <legend style="font-weight:600;">Ticket</legend>
+      {% comment %} Premier bloc : informations du ticket à créer {% endcomment %}
+
+      <div style="margin-bottom:16px;">
+        <label for="{{ tform.title.id_for_label }}">Titre</label>
+        {{ tform.title }}
+        {% for e in tform.title.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label for="{{ tform.description.id_for_label }}">Description</label>
+        {{ tform.description }}
+        {% for e in tform.description.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div style="margin-bottom:8px;">
+        <label for="{{ tform.image.id_for_label }}">Image (optionnel)</label>
+        {{ tform.image }}
+        {% for e in tform.image.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+    </fieldset>
+
+    <fieldset class="card">
+      <legend style="font-weight:600;">Critique</legend>
+      {% comment %} Deuxième bloc : informations de la critique à créer, liée au ticket ci-dessus {% endcomment %}
+
+      <div style="margin-bottom:16px;">
+        <label for="{{ rform.headline.id_for_label }}">Titre de la critique</label>
+        {{ rform.headline }}
+        {% for e in rform.headline.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div style="margin-bottom:6px;">{{ rform.rating.label }}</div>
+        {% comment %} Champ note : affiché sous forme de boutons radio de 0 à 5 {% endcomment %}
+
+        <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:center;">
+          {% for radio in rform.rating %}
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              {{ radio.tag }}
+              <span>{{ radio.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+
+        {% for e in rform.rating.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+
+      <div style="margin-bottom:8px;">
+        <label for="{{ rform.body.id_for_label }}">Commentaire</label>
+        {{ rform.body }}
+        {% for e in rform.body.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+    </fieldset>
+
+    <div style="display:flex; gap:16px; justify-content:flex-end; margin-top:16px;">
+      <a href="{% url 'feed' %}" class="btn">Annuler</a>
+      <button type="submit" class="btn">Publier</button>
+    </div>
+    {% comment %} Boutons d’action : retour au flux ou publication du ticket + critique {% endcomment %}
+  </form>
+{% endblock %}

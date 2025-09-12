@@ -1,26 +1,93 @@
 {% extends "base.html" %}
-{% block content %}
-  <h1>{% if mode == "create" %}Nouvelle critique{% else %}Modifier la critique{% endif %}</h1>
 
-  <section style="border:1px solid #ccc;padding:8px;margin-bottom:8px">
-    <strong>Ticket :</strong> {{ ticket.title }} — par {{ ticket.user.username }}
-    <br><em>{{ ticket.description }}</em>
+{% block title %}{% if mode == "create" %}Nouvelle critique{% else %}Modifier la critique{% endif %} — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on personnalise le titre selon le mode (création ou modification) {% endcomment %}
+
+{% block content %}
+  <h1 style="font-size:28px; margin:8px 0 24px; text-align:center;">
+    {% if mode == "create" %}Créer une critique{% else %}Modifier la critique{% endif %}
+  </h1>
+  {% comment %} Titre principal de la page, qui s’adapte en fonction du mode {% endcomment %}
+
+  <section class="card" style="max-width:980px; margin:0 auto 24px;">
+    <h2 style="margin:0 0 12px; font-size:24px;">
+      {% if mode == "create" %}
+        Vous êtes en train de poster en réponse à
+      {% else %}
+        Vous modifiez votre critique en réponse à
+      {% endif %}
+    </h2>
+    {% comment %} Sous-titre qui change si on crée une critique ou si on en modifie une {% endcomment %}
+
+    <div style="border:1px solid #111; border-radius:8px; padding:16px;">
+      {% comment %} Encadré rappelant le ticket concerné {% endcomment %}
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+        <div style="font-size:18px;">
+          {% if request.user == ticket.user %}
+            <strong>Vous</strong> avez demandé une critique
+          {% else %}
+            <strong>{{ ticket.user.username }}</strong> a demandé une critique
+          {% endif %}
+        </div>
+        <div class="muted" style="white-space:nowrap;">
+          {{ ticket.time_created|date:"H:i, d F Y" }}
+        </div>
+      </div>
+      {% comment %} Ligne du haut : qui a demandé la critique + date du ticket {% endcomment %}
+
+      <div style="font-weight:600; margin-bottom:12px;">{{ ticket.title }}</div>
+      {% comment %} Titre du ticket {% endcomment %}
+
+      {% if ticket.description %}
+        <p style="margin:0 0 12px;">{{ ticket.description }}</p>
+      {% endif %}
+      {% comment %} Description du ticket si elle existe {% endcomment %}
+
+      {% if ticket.image %}
+        <img src="{{ ticket.image.url }}" alt="Image du ticket"
+             style="max-width:240px; border:1px solid #111; border-radius:4px;">
+      {% endif %}
+      {% comment %} Image du ticket si elle a été fournie {% endcomment %}
+    </div>
   </section>
 
-  <form method="post" novalidate>
+  <form method="post" novalidate style="max-width:720px; margin:0 auto;">
     {% csrf_token %}
-    <div>
+    {% comment %} Formulaire de création ou modification de critique {% endcomment %}
+
+    <div style="margin-bottom:16px;">
       <label for="{{ form.headline.id_for_label }}">Titre de la critique</label>
-      {{ form.headline }} {% for e in form.headline.errors %}<p>{{ e }}</p>{% endfor %}
+      {{ form.headline }}
+      {% for e in form.headline.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
     </div>
-    <div>
-      <label for="{{ form.rating.id_for_label }}">Note (0–5)</label>
-      {{ form.rating }} {% for e in form.rating.errors %}<p>{{ e }}</p>{% endfor %}
+    {% comment %} Champ titre de la critique + erreurs éventuelles {% endcomment %}
+
+    <div style="margin-bottom:16px;">
+      <div style="margin-bottom:6px;">{{ form.rating.label }}</div>
+      <div style="display:flex; gap:28px; flex-wrap:wrap; align-items:center;">
+        {% for radio in form.rating %}
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            {{ radio.tag }} <span>{{ radio.choice_label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+      {% for e in form.rating.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
     </div>
-    <div>
+    {% comment %} Champ note sous forme de radios de 0 à 5 {% endcomment %}
+
+    <div style="margin-bottom:16px;">
       <label for="{{ form.body.id_for_label }}">Commentaire</label>
-      {{ form.body }} {% for e in form.body.errors %}<p>{{ e }}</p>{% endfor %}
+      {{ form.body }}
+      {% for e in form.body.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
     </div>
-    <button type="submit">{% if mode == "create" %}Publier{% else %}Enregistrer{% endif %}</button>
+    {% comment %} Champ texte de la critique + affichage des erreurs {% endcomment %}
+
+    <div style="display:flex; gap:16px; justify-content:flex-end; margin-top:16px;">
+      <a href="{% url 'my_posts' %}" class="btn">Annuler</a>
+      <button type="submit" class="btn">
+        {% if mode == "create" %}Publier{% else %}Enregistrer{% endif %}
+      </button>
+    </div>
+    {% comment %} Boutons d’action : annuler et enregistrer/publier {% endcomment %}
   </form>
 {% endblock %}

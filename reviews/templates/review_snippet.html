@@ -1,11 +1,22 @@
-<article class="review" style="border:1px solid #ddd;padding:8px;margin:8px 0;">
-  <header>
+<article class="review" style="border:1px solid #ccc; border-radius:8px; padding:16px; margin:16px auto; max-width:640px; background:#fff;">
+  {% comment %} Bloc représentant une critique individuelle {% endcomment %}
+
+  <header style="margin-bottom:12px;">
     <strong>Critique</strong> par {{ review.user.username }} —
-    {{ review.time_created|date:"Y-m-d H:i" }}
+    <span style="color:#555;">{{ review.time_created|date:"Y-m-d H:i" }}</span>
   </header>
-  <h3>{{ review.headline }} ({{ review.rating }}/5)</h3>
+  {% comment %} En-tête de la critique : auteur + date de création {% endcomment %}
+
+  <h3 style="margin:8px 0; font-size:20px;">
+    {{ review.headline }} ({{ review.rating }}/5)
+  </h3>
+  {% comment %} Titre de la critique et note attribuée {% endcomment %}
+
   <p>{{ review.body }}</p>
-  <div style="background:#f9f9f9;padding:6px;margin-top:6px">
+  {% comment %} Corps du texte de la critique {% endcomment %}
+
+  <div style="background:#f9f9f9; border:1px solid #eee; padding:8px; margin-top:12px; border-radius:6px;">
     <strong>Sur :</strong> {{ review.ticket.title }} — par {{ review.ticket.user.username }}
   </div>
+  {% comment %} Encadré rappelant le ticket critiqué (titre et auteur du ticket) {% endcomment %}
 </article>

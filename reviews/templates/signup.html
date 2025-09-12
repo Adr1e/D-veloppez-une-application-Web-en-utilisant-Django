@@ -1,36 +1,84 @@
 {% extends "base.html" %}
+
+{% block header_nav %}{% endblock %}
+{% comment %} On masque la navigation par défaut (pas de menu affiché sur la page d'inscription) {% endcomment %}
+
 {% block content %}
-  <h1>S'inscrire</h1>
+  <section style="max-width:640px; margin:40px auto 0; text-align:center;">
+    <h1 style="font-size:28px; margin:8px 0 24px;">Inscrivez-vous</h1>
+    {% comment %} Titre principal de la page {% endcomment %}
 
-  {# Bloc erreurs globales (non_field_errors) #}
-  {% if form.non_field_errors %}
-    <div role="alert">
-      {% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
-    </div>
-  {% endif %}
+    {% if form.non_field_errors %}
+      <div class="flash" style="margin-bottom:16px; text-align:left;">
+        {% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}
+      </div>
+    {% endif %}
+    {% comment %} Affichage des erreurs globales (ex : mots de passe différents) {% endcomment %}
 
-  <form method="post" novalidate>
-    {% csrf_token %}
+    <form method="post" novalidate style="text-align:left;">
+      {% csrf_token %}
+      {% comment %} Protection CSRF obligatoire {% endcomment %}
 
-    <div>
-      <label for="{{ form.username.id_for_label }}">Nom d'utilisateur</label>
-      {{ form.username }}
-      {% for e in form.username.errors %}<p>{{ e }}</p>{% endfor %}
-    </div>
+      <div style="margin-bottom:16px;">
+        <label for="{{ form.username.id_for_label }}" style="position:absolute; left:-10000px;">
+          Nom d'utilisateur
+        </label>
+        <input
+          type="text"
+          name="{{ form.username.html_name }}"
+          id="{{ form.username.id_for_label }}"
+          value="{{ form.username.value|default_if_none:'' }}"
+          placeholder="Nom d'utilisateur"
+          autocomplete="username"
+          autofocus
+        />
+        {% for e in form.username.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+      {% comment %} Champ nom d'utilisateur (avec placeholder et auto-focus) {% endcomment %}
 
-    <div>
-      <label for="{{ form.password1.id_for_label }}">Mot de passe</label>
-      {{ form.password1 }}
-      {% for e in form.password1.errors %}<p>{{ e }}</p>{% endfor %}
-    </div>
+      <div style="margin-bottom:16px;">
+        <label for="{{ form.password1.id_for_label }}" style="position:absolute; left:-10000px;">
+          Mot de passe
+        </label>
+        <input
+          type="password"
+          name="{{ form.password1.html_name }}"
+          id="{{ form.password1.id_for_label }}"
+          placeholder="Mot de passe"
+          autocomplete="new-password"
+        />
+        {% for e in form.password1.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+      {% comment %} Champ mot de passe principal {% endcomment %}
 
-    <div>
-      <label for="{{ form.password2.id_for_label }}">Confirmer le mot de passe</label>
-      {{ form.password2 }}
-      {% for e in form.password2.errors %}<p>{{ e }}</p>{% endfor %}
-    </div>
+      <div style="margin-bottom:24px;">
+        <label for="{{ form.password2.id_for_label }}" style="position:absolute; left:-10000px;">
+          Confirmer mot de passe
+        </label>
+        <input
+          type="password"
+          name="{{ form.password2.html_name }}"
+          id="{{ form.password2.id_for_label }}"
+          placeholder="Confirmer mot de passe"
+          autocomplete="new-password"
+        />
+        {% for e in form.password2.errors %}<p style="color:#b91c1c; margin:6px 0 0;">{{ e }}</p>{% endfor %}
+      </div>
+      {% comment %} Champ confirmation du mot de passe {% endcomment %}
 
-    <button type="submit">S'inscrire</button>
-    <p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
-  </form>
+      <div style="display:flex; gap:16px; justify-content:center; align-items:center; margin-top:8px;">
+        <a href="{% url 'login' %}"
+           style="display:inline-block; padding:10px 16px; border:1px solid #111; border-radius:8px; background:#fff; color:#111; text-decoration:none;">
+          Retourner
+        </a>
+        {% comment %} Bouton pour revenir à la page de connexion {% endcomment %}
+
+        <button type="submit"
+                style="padding:10px 16px; border:1px solid #111; border-radius:8px; background:#fff;">
+          S'inscrire
+        </button>
+        {% comment %} Bouton pour soumettre le formulaire d'inscription {% endcomment %}
+      </div>
+    </form>
+  </section>
 {% endblock %}

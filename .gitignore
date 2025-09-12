@@ -1,5 +1,23 @@
+# Base de données SQLite
+db.sqlite3
+
+# Environnement virtuel
+venv/
 .venv/
+
+# Fichiers Python compilés
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Fichiers temporaires
+*.log
+*.pot
+*.pyc
+*.swp
+
+# Media (uploads utilisateurs)
 media/
 
+# Config spécifique à l’OS ou éditeur

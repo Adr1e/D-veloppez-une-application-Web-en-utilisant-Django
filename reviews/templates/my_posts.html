@@ -1,39 +1,100 @@
 {% extends "base.html" %}
+
+{% block title %}Mes posts — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on personnalise le titre de la page {% endcomment %}
+
 {% block content %}
-  <h1>Mes posts</h1>
+  <h1 style="font-size:28px; margin:8px 0 24px; text-align:center;">Mes posts</h1>
 
-  <p>
-    <a href="{% url 'ticket_create' %}">+ Nouveau ticket</a>
-  </p>
+  {% comment %} Boutons d’actions rapides pour créer directement un ticket ou une critique {% endcomment %}
+  <div class="grid2" style="margin-bottom:24px;">
+    <a href="{% url 'ticket_create' %}" class="btn">Nouveau ticket</a>
+    <a href="{% url 'review_create_combo' %}" class="btn">Créer une critique</a>
+  </div>
 
-  <h2>Mes tickets</h2>
-  {% for t in tickets %}
-    <article style="border:1px solid #ccc;padding:8px;margin:8px 0;">
-      <header><strong>{{ t.title }}</strong> — {{ t.time_created }}</header>
-      <p>{{ t.description }}</p>
-      {% if t.image %}<img src="{{ t.image.url }}" alt="Image du ticket" style="max-width:200px">{% endif %}
-      <p>
-        <a href="{% url 'ticket_update' t.pk %}">Modifier</a> ·
-        <a href="{% url 'review_create_from_ticket' t.pk %}">Écrire une critique</a> ·
-        <a href="{% url 'ticket_delete' t.pk %}">Supprimer</a>
-      </p>
-    </article>
-  {% empty %}
-    <p>Aucun ticket.</p>
-  {% endfor %}
+  {% comment %} Section Mes tickets {% endcomment %}
+  <section class="card" style="max-width:980px; margin:0 auto 24px;">
+    <h2 style="margin:0 0 12px; text-align:center;">Mes tickets</h2>
 
-  <h2>Mes critiques</h2>
-  {% for r in reviews %}
-    <article style="border:1px solid #ccc;padding:8px;margin:8px 0;">
-      <header><strong>{{ r.headline }}</strong> — Note {{ r.rating }}/5 — {{ r.time_created }}</header>
-      <p><em>Sur : {{ r.ticket.title }}</em></p>
-      <p>{{ r.body }}</p>
-      <p>
-        <a href="{% url 'review_update' r.pk %}">Modifier</a> ·
-        <a href="{% url 'review_delete' r.pk %}">Supprimer</a>
-      </p>
-    </article>
-  {% empty %}
-    <p>Aucune critique.</p>
-  {% endfor %}
+    {% if tickets %}
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% for t in tickets %}
+          <li class="card" style="margin:12px 0;">
+            {% comment %} Message d’information affiché au-dessus de chaque ticket {% endcomment %}
+            <p style="font-style:italic; color:#555; margin:0 0 8px;">Vous avez publié un ticket</p>
+
+            {% comment %} Entête du ticket avec date et actions possibles {% endcomment %}
+            <header style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+              <div>
+                <strong>Ticket</strong>
+                <span class="muted"> — {{ t.time_created|date:"Y-m-d H:i" }}</span>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{% url 'ticket_update' t.pk %}" class="btn">Modifier</a>
+                {% if not t.has_reviewed %}
+                  {% comment %} Affiche le lien pour écrire une critique uniquement si l’utilisateur ne l’a pas déjà fait {% endcomment %}
+                  <a href="{% url 'review_create_from_ticket' t.pk %}" class="btn">Écrire une critique</a>
+                {% else %}
+                  <span class="muted" style="align-self:center;">Vous avez déjà publié une critique</span>
+                {% endif %}
+                <a href="{% url 'ticket_delete' t.pk %}" class="btn">Supprimer</a>
+              </div>
+            </header>
+
+            {% comment %} Contenu du ticket : titre, image éventuelle, description {% endcomment %}
+            <h3 style="margin:8px 0 6px;">{{ t.title }}</h3>
+
+            {% if t.image %}
+              <div style="margin:6px 0;">
+                <img src="{{ t.image.url }}" alt="Image du ticket" style="max-width:240px; border:1px solid #e5e7eb; border-radius:6px;">
+              </div>
+            {% endif %}
+
+            {% if t.description %}
+              <p style="margin:6px 0 0;">{{ t.description }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% comment %} Message affiché si l’utilisateur n’a créé aucun ticket {% endcomment %}
+      <p class="muted" style="text-align:center;">Aucun ticket.</p>
+    {% endif %}
+  </section>
+
+  {% comment %} Section Mes critiques {% endcomment %}
+  <section class="card" style="max-width:980px; margin:0 auto;">
+    <h2 style="margin:0 0 12px; text-align:center;">Mes critiques</h2>
+
+    {% if reviews %}
+      <ul style="list-style:none; padding:0; margin:0;">
+        {% for r in reviews %}
+          <li class="card" style="margin:12px 0;">
+            {% comment %} Message d’information affiché au-dessus de chaque critique {% endcomment %}
+            <p style="font-style:italic; color:#555; margin:0 0 8px;">Vous avez publié une critique</p>
+
+            {% comment %} Entête de la critique avec date et actions possibles {% endcomment %}
+            <header style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;">
+              <div>
+                <strong>Critique</strong>
+                <span class="muted"> — {{ r.time_created|date:"Y-m-d H:i" }}</span>
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="{% url 'review_update' r.pk %}" class="btn">Modifier</a>
+                <a href="{% url 'review_delete' r.pk %}" class="btn">Supprimer</a>
+              </div>
+            </header>
+
+            {% comment %} Contenu de la critique : titre, note, référence au ticket, corps {% endcomment %}
+            <h3 style="margin:8px 0 4px;">{{ r.headline }} <span class="muted">({{ r.rating }}/5)</span></h3>
+            <p style="margin:4px 0 8px;"><em>Sur : {{ r.ticket.title }}</em></p>
+            {% if r.body %}<p style="margin:0;">{{ r.body }}</p>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% comment %} Message affiché si l’utilisateur n’a publié aucune critique {% endcomment %}
+      <p class="muted" style="text-align:center;">Aucune critique.</p>
+    {% endif %}
+  </section>
 {% endblock %}

@@ -1,21 +1,47 @@
 {% extends "base.html" %}
+{% block title %}{% if mode == "create" %}Nouveau ticket{% else %}Modifier le ticket{% endif %} — LITReview{% endblock %}
+{% comment %} On hérite de base.html et on définit dynamiquement le titre selon le mode (création ou modification) {% endcomment %}
+
 {% block content %}
-  <h1>{% if mode == "create" %}Nouveau ticket{% else %}Modifier le ticket{% endif %}</h1>
-  <form method="post" enctype="multipart/form-data" novalidate>
+  <h1 style="font-size:28px; margin:8px 0 24px; text-align:center;">
+    {% if mode == "create" %}Nouveau ticket{% else %}Modifier le ticket{% endif %}
+  </h1>
+  {% comment %} Titre principal affiché au centre de la page {% endcomment %}
+
+  <form method="post" enctype="multipart/form-data" novalidate style="max-width:720px; margin:0 auto;">
     {% csrf_token %}
-    <div>
+    {% comment %} Formulaire ticket avec protection CSRF et gestion du fichier image {% endcomment %}
+
+    <div style="margin-bottom:20px;">
       <label for="{{ form.title.id_for_label }}">Titre</label>
-      {{ form.title }} {% for e in form.title.errors %}<p>{{ e }}</p>{% endfor %}
+      {{ form.title }} 
+      {% for e in form.title.errors %}<p style="color:#b91c1c;">{{ e }}</p>{% endfor %}
     </div>
-    <div>
+    {% comment %} Champ titre obligatoire + affichage des erreurs {% endcomment %}
+
+    <div style="margin-bottom:20px;">
       <label for="{{ form.description.id_for_label }}">Description</label>
-      {{ form.description }} {% for e in form.description.errors %}<p>{{ e }}</p>{% endfor %}
+      {{ form.description }} 
+      {% for e in form.description.errors %}<p style="color:#b91c1c;">{{ e }}</p>{% endfor %}
     </div>
-    <div>
+    {% comment %} Champ description du ticket + erreurs éventuelles {% endcomment %}
+
+    <div style="margin-bottom:20px;">
       <label for="{{ form.image.id_for_label }}">Image (optionnel)</label>
-      {{ form.image }} {% for e in form.image.errors %}<p>{{ e }}</p>{% endfor %}
-      {% if ticket and ticket.image %}<p>Image actuelle : <img src="{{ ticket.image.url }}" alt="Image du ticket" style="max-width:200px"></p>{% endif %}
+      {{ form.image }} 
+      {% for e in form.image.errors %}<p style="color:#b91c1c;">{{ e }}</p>{% endfor %}
+      {% if ticket and ticket.image %}
+        <p>Image actuelle : <img src="{{ ticket.image.url }}" alt="Image du ticket" style="max-width:200px"></p>
+      {% endif %}
     </div>
-    <button type="submit">{% if mode == "create" %}Créer{% else %}Enregistrer{% endif %}</button>
+    {% comment %} Champ image optionnel + aperçu de l’image actuelle si on est en mode modification {% endcomment %}
+
+    <div style="display:flex; gap:16px; justify-content:flex-end; margin-top:24px;">
+      <a href="{% url 'my_posts' %}" class="btn">Annuler</a>
+      <button type="submit" class="btn">
+        {% if mode == "create" %}Créer{% else %}Enregistrer{% endif %}
+      </button>
+    </div>
+    {% comment %} Boutons d’action : retour aux posts ou soumission du formulaire {% endcomment %}
   </form>
 {% endblock %}
